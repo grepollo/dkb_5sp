@@ -11,6 +11,30 @@
 |
 */
 
+Route::get('/test', function() {
+
+    $myCluster = new CouchbaseCluster('couchbase://localhost');
+    $myBucket = $myCluster->openBucket('5sportal');
+    $query = CouchbaseViewQuery::from('person', 'username')->key("K");
+    try {
+        $res = $myBucket->query($query, null, true);
+        if (! empty($res)) {
+            $doc = [];
+            foreach($res['rows'] as $item) {
+                $doc[] = $item['value'];
+            }
+            $items = $myBucket->get($doc);
+            foreach ($items as $item) {
+                dd((array)$item->value);
+            }
+        }
+    } catch(CouchbaseException $e) {
+        dd($e->getMessage());
+    }
+
+
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -29,3 +53,5 @@ Route::get('/', function () {
 Route::group(['middleware' => ['web']], function () {
     //
 });
+
+Route::get('/setup', 'Tools\SetupController@index');
