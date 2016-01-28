@@ -46,7 +46,7 @@
 
         <div class="login-content">
 
-            <a href="{{ url  }}" class="logo">
+            <a href="{{ url('/')  }}" class="logo">
                 <img src="assets/images/logo@2x.png" width="120" alt=""/>
             </a>
 
