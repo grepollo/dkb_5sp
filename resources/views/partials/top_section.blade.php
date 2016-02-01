@@ -9,21 +9,17 @@
 					<li class="profile-info dropdown"><!-- add class "pull-right" if you want to place this from right -->
 		
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        	<?php if($_SESSION['user']['type']!='A'){ ?>
-                            
-								<?php $usr_img = 'user'.$_SESSION['user']['id'].'.jpg';
-                                if(getimagesize(MAINLOCATION.'assets/images/users/'.$usr_img)){ ?>
-                                    <img src="<?php echo '../assets/images/users/'.$usr_img; ?>" class="img-circle" width="44" height="44" />
-                                <?php }else{ ?>
-                                    <img src="../assets/images/user.png" class="img-circle" width="44" />
-                                <?php } ?>
-                                
-                                <?php echo $_SESSION['user']['disp_name']; ?>
-                            
-                            <?php }else{ ?>
-                            		<img src="../assets/images/user.png" class="img-circle" width="44" />
-                                    <?php echo $_SESSION['user']['disp_name']; ?>
-                            <?php } ?>
+                        	@if(session('user.type') != 'A')
+                                @if(getimagesize( public_path('assets/images/users/'. 'user' . session('user.id') . '.jpg')))
+                                    <img src="{{ asset('assets/images/users/' . 'user' . session('user.id') . '.jpg' ) }}" class="img-circle" width="44" height="44" />
+                                @else
+                                    <img src="{{  asset('assets/images/user.png') }}" class="img-circle" width="44" />
+                                @endif
+                            @else
+                            	<img src="{{  asset('/assets/images/user.png') }}" class="img-circle" width="44" />
+
+                            @endif
+							{{  session('user.disp_name') }}
 						</a>
 		
 						<ul class="dropdown-menu">
@@ -38,14 +34,14 @@
 									Change Password
 								</a>
 							</li>
-                            <?php if($_SESSION['user']['type']!='A'){ ?>
+                            @if(session('user.type') !='A' )
                             <li>
 								<a href="my_profile.php">
 									<i class="entypo-user"></i>
 									My Profile
 								</a>
 							</li>
-                            <?php } ?>
+                            @endif
 						</ul>
 					</li>
 		
@@ -65,7 +61,7 @@
                     <li class="sep"></li>
                     
 					<li>
-						<a href="lockscreen.php">
+						<a href="{{ url('/lockscreen') }}">
 							Lock Screen <i class="entypo-key right"></i>
 						</a>
 					</li>
@@ -74,7 +70,7 @@
 		
 		
 					<li>
-						<a href="logout.php">
+						<a href="{{ url('/logout') }}">
 							Log Out <i class="entypo-logout right"></i>
 						</a>
 					</li>

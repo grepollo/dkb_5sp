@@ -1,5 +1,5 @@
 @extends('layout')
-@section('body')
+@section('content')
     <div class="row">
        @if(session('user.role') == 'M' || session('user.role') == 'A')
         <div class="col-sm-3 col-xs-6">

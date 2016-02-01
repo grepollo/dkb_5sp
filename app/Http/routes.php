@@ -10,49 +10,20 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-Route::get('/admin', function(){
-    $myCluster = new CouchbaseCluster('couchbase://localhost');
-    $myBucket = $myCluster->openBucket('5sportal');
-$resp = $myBucket->get("admin_1");
-    dd((array)$resp->value);
 
-});
 Route::get('/test', function() {
-$cb = new \App\CbModel();
-    $id = $cb->counter('person_counter', ['initial' => 100, 'value' => 1]);
-    dd($id);
-    $data =
-//    $myCluster = new CouchbaseCluster('couchbase://localhost');
-//    $myBucket = $myCluster->openBucket('5sportal');
-//    $query = CouchbaseViewQuery::from('person', 'username')->key("K");
-//    try {
-//        $res = $myBucket->query($query, null, true);
-//        if (! empty($res)) {
-//            $doc = [];
-//            foreach($res['rows'] as $item) {
-//                $doc[] = $item['value'];
-//            }
-//            $items = $myBucket->get($doc);
-//            foreach ($items as $item) {
-//                dd((array)$item->value);
-//            }
-//        }
-//    } catch(CouchbaseException $e) {
-//        dd($e->getMessage());
-//    }
-    $person = new \App\Person();
-    $resp = $person->getUsername("K");
-    var_dump($resp);
+    $cc= new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'));
+    $cb = $cc->openBucket('5sportal');
+    $cb->enableN1qlQuery(['http://192.168.10.10:8091']);
+    dd($cb);
+    $query = \CouchbaseN1qlQuery::fromString('SELECT * from 5sportal LIMIT 3');
+    $res = $model->cb->query($query);
+    dd($res);
 
-    if (md5('K') == $resp['password']) {
-        $resp = \Hash::check('K', $resp['password']);
-        dd('test');
-        dd('success');
-    } else {
-        $resp = \Hash::check('K', $resp['password']);
-        dd($resp);
-        dd('failed');
-    }
+    $person = new \App\Person();
+
+    $resp = $person->getAssignedPersons(2);
+    dd($resp);
 
 });
 
@@ -72,9 +43,13 @@ Route::get('/', function () {
 */
 
 Route::group(['middleware' => ['web']], function () {
-    Route::post('login', 'LoginController@attempt');
-    Route::get('logout', 'LoginController@logout');
-    Route::get('dashboard', 'DashboardController@index');
+    Route::post('/login', 'LoginController@attempt');
+    Route::get('/logout', 'LoginController@logout');
+    Route::get('/lockscreen', 'LoginController@lockscreen');
+    Route::get('/dashboard', 'DashboardController@index');
+    //Users
+    Route::get('/users', 'UsersController@index');
+    Route::get('/users/{id}', 'UsersController@show');
 });
 
 Route::get('/setup', 'Tools\SetupController@index');

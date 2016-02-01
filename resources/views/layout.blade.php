@@ -15,9 +15,9 @@
         @yield('content')
 
         <!-- Footer -->
-        @include("partials.footer.php")
+        @include('partials.footer')
     </div>
 </div>
-@include("partials.jlinks")
+@include('partials.jlinks')
 </body>
 </html>

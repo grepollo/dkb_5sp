@@ -40,7 +40,7 @@
 				</li>
                 @if(session('user.role') == 'M' || session('user.role') == 'A')
                 <li>
-					<a href="users.php">
+					<a href="{{ url('/users') }}">
 						<i class="entypo-users"></i>
 						<span class="title">User List</span>
 					</a>

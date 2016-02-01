@@ -140,7 +140,7 @@ var neonLogin = neonLogin || {};
                             // Do some stuff...
 
                             $.ajax({
-                                url: 'data/check_password.php',
+                                url: '/login',
                                 method: 'POST',
                                 dataType: 'json',
                                 data: {
@@ -164,7 +164,7 @@ var neonLogin = neonLogin || {};
                                             $(".login-page").removeClass('logging-in-lockscreen');
                                         }
                                         else if (login_status == 'success') {
-                                            window.location.href = "dashboard.php";
+                                            window.location.href = "/dashboard";
                                         }
 
                                     }, 500);

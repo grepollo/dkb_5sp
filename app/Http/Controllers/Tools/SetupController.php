@@ -29,10 +29,14 @@ class SetupController extends Controller
                         if ($table == 'person') {
                             $item['role'] = $item['type'];
                             $item['type'] = $table;
+                            //$myBucket->replace($docId, $item);
+                        } elseif ($table == 'report') {
+                            $item['report_type'] = $item['type'];
+                            $item['type'] = $table;
                             $myBucket->replace($docId, $item);
                         } else {
                             $item['type'] = $table;
-                            $myBucket->insert($docId, $item);
+                            //$myBucket->insert($docId, $item);
                         }
 
                         echo 'Inserting document: ' . $docId . '<br/>';

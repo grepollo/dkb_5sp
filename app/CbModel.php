@@ -4,8 +4,8 @@ namespace App;
 
 class CbModel
 {
-    protected $cc;
-    protected $cb;
+    public $cc;
+    public $cb;
 
     public function __construct()
     {
@@ -30,6 +30,50 @@ class CbModel
         }
 
         return $id;
+    }
+
+    public function update($docId, $data)
+    {
+        try {
+            $resp = $this->cb->replace($docId, $data);
+
+
+        } catch(\CouchbaseException $e) {
+
+            dd($e->getMessage());
+        }
+
+        return $resp;
+
+    }
+
+    public function insert($docId, $data)
+    {
+        try {
+            $resp = $this->cb->upsert($docId, $data);
+
+        } catch(\CouchbaseException $e) {
+
+            dd($e->getMessage());
+        }
+
+        return $resp;
+
+    }
+
+    public function get($docId)
+    {
+        $resp = [];
+        try {
+            $resp = $this->cb->get($docId);
+            $resp = (array)$resp->value;
+        } catch(\CouchbaseException $e) {
+
+            dd($e->getMessage());
+        }
+
+        return $resp;
+
     }
 
 }

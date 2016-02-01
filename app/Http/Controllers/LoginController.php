@@ -22,7 +22,7 @@ class LoginController extends Controller
         $resp = $person->getUsername($params['username']);
         if (! empty($resp)) {
             if (\Hash::check($params['password'], $resp['password'])) {
-                $request->session()->push('user', [
+                $request->session()->put('user', [
                     'id' => $resp['id'],
                     'username' => $resp['username'],
                     'role' => $resp['role'],
@@ -36,7 +36,7 @@ class LoginController extends Controller
                     $resp['password'] = bcrypt($params['password']);
                     $id = 'person_' . $resp['id'];
                     $person->update($id, $resp);
-                    $request->session()->push('user', [
+                    $request->session()->put('user', [
                         'id' => $resp['id'],
                         'username' => $resp['username'],
                         'role' => $resp['role'],
@@ -59,7 +59,11 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $request->session()->flush();
-
         return redirect('/');
+    }
+
+    public function lockscreen(Request $request)
+    {
+        return view('lockscreen');
     }
 }

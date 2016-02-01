@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Item;
+use App\Person;
+use App\Report;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -10,51 +13,64 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        /****** get data user wise *****/
-//        $qry_rights = '';
-//        $qry_user_rights = '';
-//        if($_SESSION['user']['type']=='U')
-//        {
-//            $qry_rights = ' AND person_id IN ('.$_SESSION['user']['id'].')';
-//        }
-//        else if($_SESSION['user']['type']=='M')
-//        {
-//
-//            if($_SESSION['user']['type']=='M')
-//            {
-//                $user_list = get_assigned_user_list($_SESSION['user']['id']);
-//
-//                if($user_list!='')
-//                {
-//                    $qry_user_rights = ' AND id IN ('.$user_list.')';
-//
-//                    $user_list .= ','.$_SESSION['user']['id'];
-//                    $qry_rights = ' AND person_id IN ('.$user_list.')';
-//                }
-//                else
-//                {
-//                    $qry_user_rights = ' AND 1!=1';
-//
-//                    $qry_rights = ' AND person_id IN ('.$_SESSION['user']['id'].')';
-//                }
-//            }
-//        }
-
-//        $sql = 'SELECT count(id) as total_users FROM person WHERE 1=1 '.$qry_user_rights;
-//        $rs_u = mysql_query($sql);
-//        $row_u = mysql_fetch_assoc($rs_u);
-        $data['total_users'] = 10;
-
-//        $sql = 'SELECT count(id) as total_report FROM report WHERE 1=1 '.$qry_rights;
-//        $rs_r = mysql_query($sql);
-//        $row_r = mysql_fetch_assoc($rs_r);
-        $data['total_report'] = 20;
-
-//        $sql = 'SELECT count(id) as total_item FROM item WHERE 1=1 '.$qry_rights;
-//        $rs_i = mysql_query($sql);
-//        $row_i = mysql_fetch_assoc($rs_i);
-        $data['total_item'] = 30;
-
+        $person = new Person();
+        $report = new Report();
+        $item = new Item();
+        $role = session('user.role');
+        $data = [
+            'total_users'  => 0,
+            'total_report' => 0,
+            'total_item'   => 0,
+        ];
+        if ($role == 'U') {
+            //get data on report and item only
+        } else {
+            if ($role == 'M') {
+                $response = $person->getAssignedPersons(session('user.id'));
+                if (!empty($response)) {
+                    //get total reports or their assigned users
+                    $data['total_users'] = count($response);
+                    foreach ($response as $row) {
+                        $reports = $report->getReportsByPerson($row['id']);
+                        if (!empty($response)) {
+                            $data['total_report'] += count($reports);
+                            //get item of the report
+                            foreach ($reports as $srow) {
+                                $items = $item->getItemsByReport($srow['id']);
+                                $data['total_item'] += count($items);
+                            }
+                        }
+                    }
+                    //get current user's report
+                    $response = $report->getReportsByPerson(session('user.id'));
+                    if (!empty($response)) {
+                        $data['total_report'] += count($response);
+                        //get item of the report
+                        foreach ($response as $row) {
+                            $items = $item->getItemsByReport($row['id']);
+                            $data['total_item'] += count($items);
+                        }
+                    }
+                }
+            } else { //admin
+                $response = $person->all([]);
+                if (!empty($response)) {
+                    //get total reports or their assigned users
+                    $data['total_users'] = count($response);
+                    foreach ($response as $row) {
+                        $reports = $report->getReportsByPerson($row['id']);
+                        if (!empty($response)) {
+                            $data['total_report'] += count($reports);
+                            //get item of the report
+                            foreach ($reports as $srow) {
+                                $items = $item->getItemsByReport($srow['id']);
+                                $data['total_item'] += count($items);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         return view('dashboard', $data);
     }

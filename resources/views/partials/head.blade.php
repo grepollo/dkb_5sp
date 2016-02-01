@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<meta http-equiv="refresh" content = "600; url=lockscreen.php">
+<meta http-equiv="refresh" content = "600; url=lockscreen">
 
 <link rel="icon" href="assets/images/favicon.ico">
 
