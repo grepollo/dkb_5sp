@@ -72,6 +72,10 @@ class UsersController extends Controller
                 }
             }
         }
+        //get list of individual reports
+
+        //get list of group reports
+
 
         return view('users_profile', $data);
     }
