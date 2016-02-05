@@ -15,9 +15,12 @@ class SetupController extends Controller
     public function index()
     {
 
-        $myCluster = new \CouchbaseCluster('couchbase://localhost');
-        $myBucket = $myCluster->openBucket('5sportal');
+        $myCluster = new \CouchbaseCluster('http://52.33.8.126:8091');
+        $myBucket = $myCluster->openBucket('default');
+        $res = $myBucket->insert('document_name', array('some'=>'value'));
+        pr($res);
         $tables = DB::select('show tables');
+
         if (!empty($tables)) {
             foreach ($tables as $table) {
                 $table = array_values(get_object_vars($table))[0];

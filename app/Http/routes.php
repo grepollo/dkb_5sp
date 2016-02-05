@@ -16,14 +16,7 @@ Route::get('/test', function() {
     $cb = $cc->openBucket('5sportal');
     $cb->enableN1qlQuery(['http://192.168.10.10:8091']);
     dd($cb);
-    $query = \CouchbaseN1qlQuery::fromString('SELECT * from 5sportal LIMIT 3');
-    $res = $model->cb->query($query);
-    dd($res);
 
-    $person = new \App\Person();
-
-    $resp = $person->getAssignedPersons(2);
-    dd($resp);
 
 });
 
@@ -56,3 +49,13 @@ Route::get('/setup', 'Tools\SetupController@index');
 Route::get('/admin', 'Tools\SetupController@addAdmin');
 
 
+/*
+|--------------------------------------------------------------------------
+| API Resource
+|--------------------------------------------------------------------------
+|
+| This route contains all the resource of the api
+*/
+Route::post('oauth/access_token', function() {
+    return Response::json(Authorizer::issueAccessToken());
+});
