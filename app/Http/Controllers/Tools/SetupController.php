@@ -15,10 +15,8 @@ class SetupController extends Controller
     public function index()
     {
 
-        $myCluster = new \CouchbaseCluster('http://52.33.8.126:8091');
-        $myBucket = $myCluster->openBucket('default');
-        $res = $myBucket->insert('document_name', array('some'=>'value'));
-        pr($res);
+        $myCluster = new \CouchbaseCluster('couchbase://localhost');
+        $myBucket = $myCluster->openBucket('5sportal');
         $tables = DB::select('show tables');
 
         if (!empty($tables)) {
@@ -32,14 +30,14 @@ class SetupController extends Controller
                         if ($table == 'person') {
                             $item['role'] = $item['type'];
                             $item['type'] = $table;
-                            //$myBucket->replace($docId, $item);
+                            $myBucket->insert($docId, $item);
                         } elseif ($table == 'report') {
                             $item['report_type'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->replace($docId, $item);
+                            $myBucket->insert($docId, $item);
                         } else {
                             $item['type'] = $table;
-                            //$myBucket->insert($docId, $item);
+                            $myBucket->insert($docId, $item);
                         }
 
                         echo 'Inserting document: ' . $docId . '<br/>';
