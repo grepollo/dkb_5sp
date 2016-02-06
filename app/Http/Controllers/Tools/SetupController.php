@@ -59,7 +59,7 @@ class SetupController extends Controller
     {
         $person = new Person();
         $data = [
-            "id"         => $person->counter('person_counter', ['value' => 1]),
+            "id"         => $person->counter('person_counter', ['initial' => 100, 'value' => 1]),
             "first_name" => "admin",
             "last_name"  => "admin",
             "gender"     => "m",
