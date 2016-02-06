@@ -19,7 +19,7 @@ class PasswordGrantVerifier
                 $auth = true;
             } else {
                 //check for old hashing
-                if (md5('K') == $resp['password']) {
+                if (md5($credentials['password']) == $resp['password']) {
                     //convert old pass to new hashing
                     $resp['password'] = bcrypt($credentials['password']);
                     $id = 'person_' . $resp['id'];

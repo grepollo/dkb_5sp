@@ -10,6 +10,7 @@ class CbModel
     public function __construct()
     {
         $this->cc= new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'));
+
         $this->cb= $this->cc->openBucket(env('CB_BUCKET', '5sportal'));
     }
 

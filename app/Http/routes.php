@@ -12,10 +12,10 @@
 */
 
 Route::get('/test', function() {
-    $cc= new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'));
-    $cb = $cc->openBucket('5sportal');
-    $cb->enableN1qlQuery(['http://192.168.10.10:8091']);
-    dd($cb);
+    $this->cc = new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'), 'admin', 'password');
+    $this->cb = $this->cc->openBucket(env('CB_BUCKET', '5sportal'));
+    pr($this->cb->get('person_2'));
+
 
 
 });

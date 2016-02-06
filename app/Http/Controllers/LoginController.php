@@ -31,7 +31,7 @@ class LoginController extends Controller
                 $message = 'success';
             } else {
                 //check for old hashing
-                if (md5('K') == $resp['password']) {
+                if (md5($params['password']) == $resp['password']) {
                     //convert old pass to new hashing
                     $resp['password'] = bcrypt($params['password']);
                     $id = 'person_' . $resp['id'];
