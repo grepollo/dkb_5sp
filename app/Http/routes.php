@@ -61,6 +61,6 @@ Route::post('oauth/access_token', function() {
     return Response::json(Authorizer::issueAccessToken());
 });
 
-Route::group(['prefix' => 'api'], function () {
+Route::group(['middleware' => ['api', 'oauth'], 'prefix' => 'api'], function () {
     Route::resource('users', 'Api\UsersController', ['except' => ['create', 'edit']]);
 });
