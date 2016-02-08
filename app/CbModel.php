@@ -2,6 +2,10 @@
 
 namespace App;
 
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
+
 class CbModel
 {
     public $cc;
@@ -10,8 +14,25 @@ class CbModel
     public function __construct()
     {
         $this->cc= new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'));
-
         $this->cb= $this->cc->openBucket(env('CB_BUCKET', '5sportal'));
+    }
+
+    public function respondWithItem($item, $callback)
+    {
+        $fractal = new Manager();
+        $resource = new Item($item, $callback);
+        $rootScope = $fractal->createData($resource);
+
+        return $rootScope->toArray();
+    }
+
+    public function respondWithCollection($collection, $callback)
+    {
+        $fractal = new Manager();
+        $resource = new Collection($collection, $callback);
+        $rootScope = $fractal->createData($resource);
+
+        return $rootScope->toArray();
     }
 
     public function counter($docId, $params)
@@ -27,7 +48,7 @@ class CbModel
                 $id = $resp->value;
             }
         } catch(\CouchbaseException $e) {
-            dd($e->getMessage());
+            $resp['error'] = $e->getMessage();
         }
 
         return $id;
@@ -36,12 +57,12 @@ class CbModel
     public function update($docId, $data)
     {
         try {
-            $resp = $this->cb->replace($docId, $data);
+            $resp = (array)$this->cb->replace($docId, $data);
 
 
         } catch(\CouchbaseException $e) {
 
-            dd($e->getMessage());
+            $resp['error'] = $e->getMessage();
         }
 
         return $resp;
@@ -51,11 +72,11 @@ class CbModel
     public function insert($docId, $data)
     {
         try {
-            $resp = $this->cb->upsert($docId, $data);
+            $resp = (array)$this->cb->upsert($docId, $data);
 
         } catch(\CouchbaseException $e) {
 
-            dd($e->getMessage());
+            $resp['error'] = $e->getMessage();
         }
 
         return $resp;
@@ -70,7 +91,21 @@ class CbModel
             $resp = (array)$resp->value;
         } catch(\CouchbaseException $e) {
 
-            dd($e->getMessage());
+            $resp['error'] = $e->getMessage();
+        }
+
+        return $resp;
+
+    }
+
+    public function delete($docId)
+    {
+        try {
+            $resp = (array)$this->cb->remove($docId);
+
+        } catch(\CouchbaseException $e) {
+
+            $resp['error'] = $e->getMessage();
         }
 
         return $resp;

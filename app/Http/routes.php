@@ -12,17 +12,18 @@
 */
 
 Route::get('/test', function() {
-    $this->cc = new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'), 'admin', 'password');
-    $this->cb = $this->cc->openBucket(env('CB_BUCKET', '5sportal'));
-    pr($this->cb->get('person_2'));
+//    $this->cc = new \CouchbaseCluster(env('CB_HOST', 'couchbase://localhost'), 'admin', 'password');
+//    $this->cb = $this->cc->openBucket(env('CB_BUCKET', '5sportal'));
+//    pr($this->cb->get('person_2'));
+    pr(my_encode(112));
 
 
 
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Route::get('/', function () {
+//    return view('welcome');
+//});
 
 /*
 |--------------------------------------------------------------------------
@@ -51,11 +52,15 @@ Route::get('/admin', 'Tools\SetupController@addAdmin');
 
 /*
 |--------------------------------------------------------------------------
-| API Resource
+| API Resource (REST)
 |--------------------------------------------------------------------------
 |
 | This route contains all the resource of the api
 */
 Route::post('oauth/access_token', function() {
     return Response::json(Authorizer::issueAccessToken());
+});
+
+Route::group(['prefix' => 'api'], function () {
+    Route::resource('users', 'Api\UsersController', ['except' => ['create', 'edit']]);
 });

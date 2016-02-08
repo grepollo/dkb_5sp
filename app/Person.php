@@ -22,20 +22,21 @@ class Person extends CbModel
             $query = \CouchbaseViewQuery::from('person', 'username');
         }
 
-        $data = [];
+        $result = [];
         try {
             $res = $this->cb->query($query, null, true);
             if (! empty($res)) {
-
+                $result['totalRecords'] = $res['total_rows'];
                 foreach($res['rows'] as $item) {
-                    $data[] = $item['value'];
+                    $result['data'][] = $item['value'];
                 }
             }
         } catch(\CouchbaseException $e) {
-            dd($e->getMessage());
+
+            $result['error'] = $e->getMessage();
         }
 
-        return $data;
+        return $result;
     }
 
     public function getAssignedPersons($managerID)
@@ -50,8 +51,8 @@ class Person extends CbModel
                 }
             }
         } catch(\CouchbaseException $e) {
-            $persons = [];
-            dd($e->getMessage());
+
+            $persons['error'] = $e->getMessage();
         }
 
         return $persons;
@@ -70,40 +71,14 @@ class Person extends CbModel
                 }
             }
         } catch(\CouchbaseException $e) {
-            dd($e->getMessage());
+
+            $person['error'] = $e->getMessage();
         }
 
         return $person;
     }
 
-    public function update($docId, $data)
-    {
-        try {
-            $resp = $this->cb->replace($docId, $data);
 
-
-        } catch(\CouchbaseException $e) {
-
-            dd($e->getMessage());
-        }
-
-        return $resp;
-
-    }
-
-    public function insert($docId, $data)
-    {
-        try {
-            $resp = $this->cb->upsert($docId, $data);
-
-        } catch(\CouchbaseException $e) {
-
-            dd($e->getMessage());
-        }
-
-        return $resp;
-
-    }
 
 
 }

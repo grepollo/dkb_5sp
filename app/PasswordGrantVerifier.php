@@ -34,8 +34,14 @@ class PasswordGrantVerifier
             $auth = false;
         }
 
-
         if ($auth) {
+            session()->put('user', [
+                'id' => $resp['id'],
+                'username' => $resp['username'],
+                'role' => $resp['role'],
+                'disp_name' => $resp['role'] == 'A' ? 'Administrator' : $resp['first_name'] . ' ' . $resp['last_name'],
+            ]);
+
             return my_decode($resp['id']);
         }
 

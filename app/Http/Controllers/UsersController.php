@@ -30,8 +30,7 @@ class UsersController extends Controller
             //get all
             $option = [ 'limit' => $data['limit'], 'skip' => $data['skip']];
             $response = $this->person->all($option);
-
-            if (! empty($response)) {
+            if (! isset($response['error'])) {
                 foreach($response as $row) {
                         //get users report count
                         $reports= $this->report->getReportsByPerson($row['id']);
@@ -52,32 +51,6 @@ class UsersController extends Controller
         }
 
         return view('users', $data);
-    }
-
-    public function show($id, Request $request)
-    {
-        $id = my_decode($id);
-        //get user info
-        $data['user'] = $this->person->get('person_'. $id);
-        //get user report count
-        $reports= $this->report->getReportsByPerson($id);
-        $data['totalIReport'] = 0;
-        $data['totalGReport'] = 0;
-        if (! empty($reports)) {
-            foreach($reports as $srow) {
-                if ($srow['report_type'] == 0) {
-                    $data['totalIReport'] += 1;
-                } else {
-                    $data['totalGReport'] += 1;
-                }
-            }
-        }
-        //get list of individual reports
-
-        //get list of group reports
-
-
-        return view('users_profile', $data);
     }
 
     public function autocomplete(Request $request)
