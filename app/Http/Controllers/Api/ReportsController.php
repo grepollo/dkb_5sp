@@ -8,9 +8,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Transformers\UserTransformer;
+use Transformers\ReportTransformer;
+use Transformers\UsersTransformer;
 
-class UsersController extends Controller
+class ReportsController extends Controller
 {
     public function __construct()
     {
@@ -18,59 +19,37 @@ class UsersController extends Controller
         $this->report = new Report();
     }
 
-    public function index(Request $request)
+    public function index($userId, Request $request)
     {
+        $userId = (int)my_decode($userId);
         $params = $request->all();
-        $role = session('user.role');
-        $data['items'] = [];
-        $data['totalRecords'] = 0;
-        $data['limit'] = isset($params['limit']) ? $params['limit'] : 5;
-        $data['skip'] = isset($params['skip']) ? $params['skip'] : 0;
-        //get all
-        $option = ['limit' => $data['limit'], 'skip' => $data['skip']];
-        $response = $this->person->all($option);
-        if (!isset($response['error'])) {
-            $data['totalRecords'] = $response['totalRecords'];
-            foreach ($response['data'] as $row) {
-                //get users report count
-                $reports = $this->report->getReportsByPerson($row['id']);
-                $row['id'] = my_encode($row['id']);
-                $row['totalIReport'] = 0;
-                $row['totalGReport'] = 0;
-                if (!empty($reports['data'])) {
-                    foreach ($reports['data'] as $srow) {
-
-                        if ($srow['report_type'] == 0) {
-                            $row['totalIReport'] += 1;
-                        } else {
-                            $row['totalGReport'] += 1;
-                        }
-
-                    }
-                }
-                $data['items'][] = $row;
+        $response = $this->report->individual($userId);
+        $data = ['individual' => [], 'group' => []];
+        if (! isset($response['error'])) {
+            foreach ($response['data'] as $item) {
+                $item['id'] = my_encode($item['id']);
+                $data['individual'][] = $item;
             }
-
-            return response(['data' => $data]);
-        } else {
-
-            return response(['error' => $response['error']]);
         }
+        $response = $this->report->group($userId);
+        if (! isset($response['error'])) {
+            foreach ($response['data'] as $item) {
+                $item['id'] = my_encode($item['id']);
+                $data['group'][] = $item;
+            }
+        }
+
+        return response(['data' => $data]);
     }
 
     public function show($id, Request $request)
     {
-        $id = (int)my_decode($id);
+        $id = my_decode($id);
         //get user info
-        $data = $this->person->get('person_' . $id);
-        if (!isset($data['error'])) {
-            //get user report count
-            $reports = $this->report->individual($id);
-            $data['totalIReport'] = isset($reports['data']) ? count($reports['data']) : 0;
-            $reports = $this->report->group($id);
-            $data['totalGReport'] = isset($reports['data']) ? count($reports['data']) : 0;
-            $data['id'] = my_encode((string)$id);
-            return response($this->report->respondWithItem($data, new UserTransformer));
+        $data = $this->report->get('report_'. $id);
+        if (! isset($data['error'])) {
+
+            return response($this->report->respondWithItem($data, new ReportTransformer));
         }
 
         return response(['error' => $data['error']]);
@@ -85,7 +64,7 @@ class UsersController extends Controller
     {
 
         $validator = \Validator::make($request->all(), [
-            'username'   => 'bail|required', 'password' => 'required',
+            'username' => 'bail|required', 'password' => 'required',
             'first_name' => 'required', 'last_name' => 'required', 'email' => 'required|email',
         ]);
 
@@ -97,7 +76,7 @@ class UsersController extends Controller
         //check if username does not exist
         $params = $request->all();
         $resp = $this->person->getUsername($params['username']);
-        if (!empty($resp)) {
+        if (! empty($resp)) {
 
             return response(['error' => 'Username already exist.']);
         }
@@ -108,10 +87,10 @@ class UsersController extends Controller
         $params['created'] = Carbon::now()->toDateTimeString();
 
         $resp = $this->person->insert('person_' . $params['id'], $params);
-        if (!isset($resp['error'])) {
+        if (! isset($resp['error'])) {
             return response([
                 'success' => 'User created.',
-                'data'    => $this->report->respondWithItem($params, new UserTransformer)
+                'data' => $this->report->respondWithItem($params, new UsersTransformer )
             ]);
         }
 
@@ -137,10 +116,10 @@ class UsersController extends Controller
         $user = array_merge($user, $params);
 
         $resp = $this->person->update($id, $user);
-        if (!isset($resp['error'])) {
+        if (! isset($resp['error'])) {
             return response([
                 'success' => 'User updated.',
-                'data'    => $this->report->respondWithItem($user, new UserTransformer)
+                'data' => $this->report->respondWithItem($user, new UsersTransformer )
             ]);
         }
 
@@ -157,7 +136,7 @@ class UsersController extends Controller
     {
         $id = 'person_' . my_decode($id);
         $resp = $this->person->delete($id);
-        if (!isset($resp['error'])) {
+        if (! isset($resp['error'])) {
 
             return response(['success' => 'User deleted.']);
         }

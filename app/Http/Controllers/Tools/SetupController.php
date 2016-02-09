@@ -30,14 +30,14 @@ class SetupController extends Controller
                         if ($table == 'person') {
                             $item['role'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->insert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         } elseif ($table == 'report') {
                             $item['report_type'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->insert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         } else {
                             $item['type'] = $table;
-                            $myBucket->insert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         }
 
                         echo 'Inserting document: ' . $docId . '<br/>';
@@ -70,6 +70,7 @@ class SetupController extends Controller
             "country"    => "",
             "created"    => "",
             "occupation" => "",
+            "role"       => "A",
             "type"       => "person"
         ];
 

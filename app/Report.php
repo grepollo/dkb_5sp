@@ -12,22 +12,105 @@ class Report extends CbModel
         $this->type = "report";
     }
 
-    public function getReportsByPerson($personId)
+    public function getReportsByPerson($personId, $params = [])
     {
-        $query = \CouchbaseViewQuery::from('persons_report', 'by_person')->key($personId);
-        $data = [];
-        try {
-            $response = $this->cb->query($query, null, true);
-            if (! empty($response['rows'])) {
-                foreach($response['rows'] as $item) {
-                    $data[] = $item['value'];
-                }
-            }
-        } catch(\CouchbaseException $e) {
-            $response = [];
-            dd($e->getMessage());
+        $limit = isset($params['limit']) ? $params['limit'] : 0;
+        $skip = isset($params['skip']) ? $params['skip'] : 0;
+        if (isset($params['limit'])) {
+            $query = \CouchbaseViewQuery::from('persons_report', 'by_person')
+                ->key($personId)
+                ->limit($limit)->skip($skip);
+        } else {
+            $query = \CouchbaseViewQuery::from('persons_report', 'by_person')
+                ->key($personId);
         }
 
-        return $data;
+        $result = [];
+        try {
+            $res = $this->cb->query($query, null, true);
+            if (! empty($res)) {
+                $result['data'] = [];
+                $count = 0;
+                foreach($res['rows'] as $item) {
+                    $result['data'][] = $item['value'];
+                    $count++;
+                }
+                $result['totalRecords'] = $count;
+            }
+        } catch(\CouchbaseException $e) {
+
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
+
+    }
+
+    public function individual($personId, $params = [])
+    {
+        $limit = isset($params['limit']) ? $params['limit'] : 0;
+        $skip = isset($params['skip']) ? $params['skip'] : 0;
+        if (isset($params['limit'])) {
+            $query = \CouchbaseViewQuery::from('individual_reports', 'by_person')
+                ->key($personId)
+                ->limit($limit)->skip($skip);
+        } else {
+            $query = \CouchbaseViewQuery::from('individual_reports', 'by_person')
+                ->key($personId);
+        }
+
+        $result = [];
+        try {
+            $res = $this->cb->query($query, null, true);
+            if (! empty($res)) {
+                $result['data'] = [];
+                $count = 0;
+                foreach($res['rows'] as $item) {
+                    $result['data'][] = $item['value'];
+                    $count++;
+                }
+                $result['totalRecords'] = $count;
+            }
+        } catch(\CouchbaseException $e) {
+
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
+
+    }
+
+    public function group($personId, $params = [])
+    {
+        $limit = isset($params['limit']) ? $params['limit'] : 0;
+        $skip = isset($params['skip']) ? $params['skip'] : 0;
+        if (isset($params['limit'])) {
+            $query = \CouchbaseViewQuery::from('group_reports', 'by_person')
+                ->key($personId)
+                ->limit($limit)->skip($skip);
+        } else {
+            $query = \CouchbaseViewQuery::from('group_reports', 'by_person')
+                ->key($personId);
+        }
+
+        $result = [];
+        try {
+            $res = $this->cb->query($query, null, true);
+            if (! empty($res)) {
+                $result['data'] = [];
+                $count = 0;
+                foreach($res['rows'] as $item) {
+                    $result['data'][] = $item['value'];
+                    $count++;
+                }
+                $result['totalRecords'] = $count;
+            }
+        } catch(\CouchbaseException $e) {
+
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
+
     }
 }

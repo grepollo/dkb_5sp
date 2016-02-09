@@ -63,4 +63,5 @@ Route::post('oauth/access_token', function() {
 
 Route::group(['middleware' => ['api', 'oauth'], 'prefix' => 'api'], function () {
     Route::resource('users', 'Api\UsersController', ['except' => ['create', 'edit']]);
+    Route::resource('users.reports', 'Api\ReportsController', ['except' => ['create', 'edit']]);
 });
