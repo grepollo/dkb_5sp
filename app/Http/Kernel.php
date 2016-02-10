@@ -34,6 +34,7 @@ class Kernel extends HttpKernel
             'throttle:60,1',
             \LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware::class,
             \App\Http\Middleware\Cors::class,
+            \App\Http\Middleware\ValidateToken::class,
         ],
     ];
 

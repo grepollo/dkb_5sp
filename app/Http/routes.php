@@ -58,7 +58,12 @@ Route::get('/admin', 'Tools\SetupController@addAdmin');
 | This route contains all the resource of the api
 */
 Route::post('oauth/access_token', function() {
-    return Response::json(Authorizer::issueAccessToken());
+    $resp = Authorizer::issueAccessToken();
+    if ($resp) {
+        session()->put($resp['access_token'], session()->get('user'));
+    }
+
+    return Response::json($resp);
 });
 
 Route::group(['middleware' => ['api', 'oauth'], 'prefix' => 'api'], function () {

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Transformers\ReportTransformer;
-use Transformers\UsersTransformer;
+use Transformers\ReportsTransformer;
 
 class ReportsController extends Controller
 {
@@ -19,11 +19,11 @@ class ReportsController extends Controller
         $this->report = new Report();
     }
 
-    public function index($userId, Request $request)
+    public function index($reportId, Request $request)
     {
-        $userId = (int)my_decode($userId);
+        $reportId = (int)my_decode($reportId);
         $params = $request->all();
-        $response = $this->report->individual($userId);
+        $response = $this->report->individual($reportId);
         $data = ['individual' => [], 'group' => []];
         if (! isset($response['error'])) {
             foreach ($response['data'] as $item) {
@@ -31,7 +31,7 @@ class ReportsController extends Controller
                 $data['individual'][] = $item;
             }
         }
-        $response = $this->report->group($userId);
+        $response = $this->report->group($reportId);
         if (! isset($response['error'])) {
             foreach ($response['data'] as $item) {
                 $item['id'] = my_encode($item['id']);
@@ -42,10 +42,9 @@ class ReportsController extends Controller
         return response(['data' => $data]);
     }
 
-    public function show($id, Request $request)
+    public function show($reportId, $id, Request $request)
     {
         $id = my_decode($id);
-        //get user info
         $data = $this->report->get('report_'. $id);
         if (! isset($data['error'])) {
 
@@ -56,41 +55,38 @@ class ReportsController extends Controller
     }
 
     /**
-     * Create new user
+     * Create new report
      *
-     * @param Requests\AddUserRequest|Request $request
+     * @param Requests\AddReportRequest|Request $request
      */
-    public function store(Request $request)
+    public function store($reportId, Request $request)
     {
-
+        $reportId = my_decode($reportId);
         $validator = \Validator::make($request->all(), [
-            'username' => 'bail|required', 'password' => 'required',
-            'first_name' => 'required', 'last_name' => 'required', 'email' => 'required|email',
+            'name' => 'bail|required', 'description' => 'required'
         ]);
-
         if ($validator->fails()) {
 
             return response(['error' => $validator->errors()->getMessages()]);
         }
 
-        //check if username does not exist
+        //check if reportname does not exist
         $params = $request->all();
-        $resp = $this->person->getUsername($params['username']);
-        if (! empty($resp)) {
-
-            return response(['error' => 'Username already exist.']);
-        }
+        //get author
+        $report = $this->person->get('person_' . $reportId);
         //init default values
-        $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
-        $params['type'] = 'person';
-        $params['role'] = 'U';
+        $params['id'] = $this->report->counter('report_counter', ['initial' => 1000, 'value' => 1]);
+        $params['person_id'] = (int)$reportId;
+        $params['author'] = isset($report['reportname']) ? $report['reportname'] : '';
+        $params['type'] = 'report';
+        $params['report_type'] = isset($params['report_type']) ? (int)$params['report_type'] : 0;
+        $params['is_archive'] = isset($params['is_archive']) ? $params['is_archive'] : 'N';
         $params['created'] = Carbon::now()->toDateTimeString();
-
-        $resp = $this->person->insert('person_' . $params['id'], $params);
+        $resp = $this->report->insert('report_' . $params['id'], $params);
         if (! isset($resp['error'])) {
             return response([
-                'success' => 'User created.',
-                'data' => $this->report->respondWithItem($params, new UsersTransformer )
+                'success' => 'Report created.',
+                'data' => $this->report->respondWithItem($params, new ReportTransformer)
             ]);
         }
 
@@ -102,24 +98,26 @@ class ReportsController extends Controller
     }
 
     /**
-     * Update a user
+     * Update a report
      *
      * @param         $id
      * @param Request $request
      */
-    public function update($id, Request $request)
+    public function update($userID, $id, Request $request)
     {
-        $id = 'person_' . my_decode($id);
+        $id = 'report_' . my_decode($id);
         $params = $request->all();
+        $params['report_type'] = isset($params['report_type']) ? (int)$params['report_type'] : 0;
         //get all info
-        $user = $this->person->get($id);
-        $user = array_merge($user, $params);
+        $report = $this->report->get($id);
 
-        $resp = $this->person->update($id, $user);
+        $report = array_merge($report, $params);
+
+        $resp = $this->report->update($id, $report);
         if (! isset($resp['error'])) {
             return response([
-                'success' => 'User updated.',
-                'data' => $this->report->respondWithItem($user, new UsersTransformer )
+                'success' => 'Report updated.',
+                'data' => $this->report->respondWithItem($report, new ReportTransformer )
             ]);
         }
 
@@ -127,18 +125,18 @@ class ReportsController extends Controller
     }
 
     /**
-     * Delete a user
+     * Delete a report
      *
      * @param         $id
      * @param Request $request
      */
     public function destroy($id)
     {
-        $id = 'person_' . my_decode($id);
-        $resp = $this->person->delete($id);
+        $id = 'report_' . my_decode($id);
+        $resp = $this->report->delete($id);
         if (! isset($resp['error'])) {
 
-            return response(['success' => 'User deleted.']);
+            return response(['success' => 'Report deleted.']);
         }
 
         return response(['error' => $resp['error']]);

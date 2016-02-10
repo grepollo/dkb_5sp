@@ -12,21 +12,35 @@ class Item extends CbModel
         $this->type = "item";
     }
 
-    public function getItemsByReport($reportId)
+    public function getItemsByReport($reportId, $params)
     {
-        $query = \CouchbaseViewQuery::from('reports_items', 'by_report')->key($reportId);
-        $data = [];
-        try {
-            $response = $this->cb->query($query, null, true);
-            if (! empty($response['rows'])) {
-                foreach($response['rows'] as $item) {
-                    $data[] = $item['value'];
-                }
-            }
-        } catch(\CouchbaseException $e) {
-            dd($e->getMessage());
+        $limit = isset($params['limit']) ? $params['limit'] : 0;
+        $skip = isset($params['skip']) ? $params['skip'] : 0;
+        if (isset($params['limit'])) {
+            $query = \CouchbaseViewQuery::from('reports_items', 'by_report')
+                ->key($reportId)
+                ->limit($limit)->skip($skip);
+        } else {
+            $query = \CouchbaseViewQuery::from('reports_items', 'by_report')->key($reportId);
         }
 
-        return $data;
+        $result = [];
+        try {
+            $res = $this->cb->query($query, null, true);
+            if (! empty($res)) {
+                $result['data'] = [];
+                $count = 0;
+                foreach($res['rows'] as $item) {
+                    $result['data'][] = $item['value'];
+                    $count++;
+                }
+                $result['totalRecords'] = $count;
+            }
+        } catch(\CouchbaseException $e) {
+
+            $result['error'] = $e->getMessage();
+        }
+
+        return $result;
     }
 }
