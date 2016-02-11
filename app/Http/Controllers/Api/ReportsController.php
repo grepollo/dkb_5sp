@@ -26,17 +26,11 @@ class ReportsController extends Controller
         $response = $this->report->individual($reportId);
         $data = ['individual' => [], 'group' => []];
         if (! isset($response['error'])) {
-            foreach ($response['data'] as $item) {
-                $item['id'] = my_encode($item['id']);
-                $data['individual'][] = $item;
-            }
+            $data['individual'] = $this->report->respondWithCollection($response['data'], new ReportTransformer);
         }
         $response = $this->report->group($reportId);
         if (! isset($response['error'])) {
-            foreach ($response['data'] as $item) {
-                $item['id'] = my_encode($item['id']);
-                $data['group'][] = $item;
-            }
+            $data['group'] = $this->report->respondWithCollection($response['data'], new ReportTransformer);
         }
 
         return response(['data' => $data]);

@@ -28,7 +28,7 @@ class ValidateToken
             if($expiry->diffInHours(Carbon::now()) > 24) { //24 hours
                 $oauthToken->delete();
             } else { //if not refresh expiry by 1 hour
-                $oauthToken->expire_time = $expiry->subMinutes($expiry->diffInMinutes(Carbon::now()))->timestamp;
+                $oauthToken->expire_time = Carbon::now()->addHour()->timestamp;
                 $oauthToken->save();
             }
         }

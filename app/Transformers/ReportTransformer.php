@@ -18,7 +18,7 @@ class ReportTransformer extends TransformerAbstract
             'name'        => $item['name'],
             'description' => isset($item['description']) ? $item['description'] : '',
             'created'     => isset($item['created']) ? $item['created'] : '',
-            'person_id'   => isset($item['person_id']) ? $item['person_id'] : '',
+            'person_id'   => isset($item['person_id']) ? my_encode($item['person_id']) : '',
             'author'      => isset($item['author']) ? $item['author'] : '',
             'is_archive'  => isset($item['is_archive']) ? $item['is_archive'] : '',
             'report_type' => isset($item['report_type']) ? $item['report_type'] : ''
