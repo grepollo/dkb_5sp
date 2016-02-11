@@ -61,6 +61,7 @@ Route::post('oauth/access_token', function() {
     $resp = Authorizer::issueAccessToken();
     if ($resp) {
         session()->put($resp['access_token'], session()->get('user'));
+        $resp['user'] = session()->get('user');
     }
 
     return Response::json($resp);

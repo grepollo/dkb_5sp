@@ -47,3 +47,19 @@ if (! function_exists('my_decode')) {
         return base64_decode(str_rot13(base64_decode(trim($str))));
     }
 }
+
+if (! function_exists('get_token')) {
+    /**
+     * Check route uri and return active string
+     *
+     * @param object $request
+     *
+     * @return string
+     */
+    function get_token($request)
+    {
+        $token = explode(' ', $request->header('Authorization'));
+
+        return end($token);
+    }
+}

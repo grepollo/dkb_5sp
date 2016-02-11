@@ -55,6 +55,8 @@ class ReportsController extends Controller
      */
     public function store($reportId, Request $request)
     {
+        pr(session()->all());
+        pr(session(get_token($request)));
         $reportId = my_decode($reportId);
         $validator = \Validator::make($request->all(), [
             'name' => 'bail|required', 'description' => 'required'
