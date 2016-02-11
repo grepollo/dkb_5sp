@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use League\OAuth2\Server\Exception\OAuthException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Foundation\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -46,6 +47,13 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        return parent::render($request, $e);
+        if ($e instanceof OAuthException){
+            return response()->json([
+                'error' => $e->errorType,
+                'error_description' => $e->getMessage()
+            ], $e->httpStatusCode, $e->getHttpHeaders());
+        } else {
+            return parent::render($request, $e);
+        }
     }
 }
