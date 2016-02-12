@@ -103,6 +103,7 @@ class UsersController extends Controller
         }
         //init default values
         $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
+        $params['password'] = bcrypt($params['password']);
         $params['type'] = 'person';
         $params['role'] = 'U';
         $params['created'] = Carbon::now()->toDateTimeString();
@@ -130,13 +131,23 @@ class UsersController extends Controller
      */
     public function update($id, Request $request)
     {
-        $id = 'person_' . my_decode($id);
+        $id = my_decode($id);
+        $docId = 'person_' . $id;
         $params = $request->all();
         //get all info
         $user = $this->person->get($id);
+        //filter null values
+        foreach($params as $field => $val) {
+            if (is_null($val) || empty($val)) {
+                unset($params[$field]);
+            }
+        }
+        if (isset($params['password']) && $params['password'] != $user['password']) {
+            $params['password'] = bcrypt($params['password']);
+        }
         $user = array_merge($user, $params);
 
-        $resp = $this->person->update($id, $user);
+        $resp = $this->person->update($docId, $user);
         if (!isset($resp['error'])) {
             return response([
                 'success' => 'User updated.',
