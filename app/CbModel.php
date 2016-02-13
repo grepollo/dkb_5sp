@@ -2,14 +2,17 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 
-class CbModel
+abstract class CbModel
 {
-    public $cc;
-    public $cb;
+    protected $cc;
+    protected $cb;
+    protected $type;
+    protected $fillable = [];
 
     public function __construct()
     {
@@ -31,8 +34,7 @@ class CbModel
         $fractal = new Manager();
         $resource = new Collection($collection, $callback);
         $rootScope = $fractal->createData($resource);
-
-        return $rootScope->toArray();
+        return $rootScope->toArray()['data'];
     }
 
     public function counter($docId, $params)
@@ -54,12 +56,19 @@ class CbModel
         return $id;
     }
 
-    public function update($docId, $data)
+    public function update($id, $data)
     {
+        $id = my_decode($id);
+        $docId = $this->type . '_' . $id;
+        //get old records
+        $info = $this->cb->get($docId);
+        $data = array_replace((array)$info->value, $this->fill($data));
+        $data['updated'] = Carbon::now()->toDateTimeString();
         try {
             $resp = (array)$this->cb->replace($docId, $data);
-
-
+            if (empty($resp['error'])) {
+                $resp = $data;
+            }
         } catch(\CouchbaseException $e) {
 
             $resp['error'] = $e->getMessage();
@@ -69,11 +78,18 @@ class CbModel
 
     }
 
-    public function insert($docId, $data)
+    public function insert($id, $data)
     {
+        $docId = $this->type . '_' . $id;
+        $data = $this->fill($data);
+        $data['id'] = $id;
+        $data['type'] = $this->type;
+        $data['created'] = Carbon::now()->toDateTimeString();
         try {
             $resp = (array)$this->cb->upsert($docId, $data);
-
+            if (empty($resp['error'])) {
+                $resp = $data;
+            }
         } catch(\CouchbaseException $e) {
 
             $resp['error'] = $e->getMessage();
@@ -110,6 +126,25 @@ class CbModel
 
         return $resp;
 
+    }
+
+    /**
+     * Fill array of data base on fillable fields
+     * @param $data
+     *
+     * @return array
+     */
+    private function fill($data)
+    {
+        $filtered =  array_intersect_key($data, array_flip($this->fillable));
+
+//        foreach($filtered as $field => $val) {
+//            if (empty($val)) { pr($field, false);
+//                unset($filtered[$field]);
+//            }
+//        }
+
+        return $filtered;
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\OauthCustomSession;
 use App\Person;
 use App\Report;
 use Carbon\Carbon;
@@ -21,7 +22,10 @@ class UsersController extends Controller
     public function index(Request $request)
     {
         $params = $request->all();
-        $role = session('user.role');
+        $session = OauthCustomSession::find(get_token($request));
+        if ($session->role == 'U') {
+            return response(['error' => 'User not authorize to this resource.']);
+        }
         $data['items'] = [];
         $data['totalRecords'] = 0;
         $data['limit'] = isset($params['limit']) ? $params['limit'] : 5;
@@ -80,10 +84,11 @@ class UsersController extends Controller
      * Create new user
      *
      * @param Requests\AddUserRequest|Request $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
     public function store(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'username'   => 'bail|required', 'password' => 'required',
             'first_name' => 'required', 'last_name' => 'required', 'email' => 'required|email',
@@ -102,12 +107,11 @@ class UsersController extends Controller
             return response(['error' => 'Username already exist.']);
         }
         //init default values
-        $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
-        $params['type'] = 'person';
+        $id = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
         $params['role'] = 'U';
-        $params['created'] = Carbon::now()->toDateTimeString();
+        $params['password'] = bcrypt($params['password']);
 
-        $resp = $this->person->insert('person_' . $params['id'], $params);
+        $resp = $this->person->insert($id, $params);
         if (!isset($resp['error'])) {
             return response([
                 'success' => 'User created.',
@@ -127,20 +131,17 @@ class UsersController extends Controller
      *
      * @param         $id
      * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
     public function update($id, Request $request)
     {
-        $id = 'person_' . my_decode($id);
         $params = $request->all();
-        //get all info
-        $user = $this->person->get($id);
-        $user = array_merge($user, $params);
-
-        $resp = $this->person->update($id, $user);
+        $resp = $this->person->update($id, $params);
         if (!isset($resp['error'])) {
             return response([
                 'success' => 'User updated.',
-                'data'    => $this->report->respondWithItem($user, new UserTransformer)
+                'data'    => $this->report->respondWithItem($resp, new UserTransformer)['data']
             ]);
         }
 
@@ -152,6 +153,8 @@ class UsersController extends Controller
      *
      * @param         $id
      * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
      */
     public function destroy($id)
     {

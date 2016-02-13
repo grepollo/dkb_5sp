@@ -4,12 +4,13 @@ namespace App;
 
 class Report extends CbModel
 {
-    protected $type;
+    protected $type = "report";
+
+    protected $fillable = [ 'type', 'name', 'description', 'person_id', 'author', 'is_archive', 'report_type' ];
 
     public function __construct()
     {
         parent::__construct();
-        $this->type = "report";
     }
 
     public function getReportsByPerson($personId, $params = [])

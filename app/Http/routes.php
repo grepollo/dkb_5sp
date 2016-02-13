@@ -21,9 +21,9 @@ Route::get('/test', function() {
 
 });
 
-//Route::get('/', function () {
-//    return view('welcome');
-//});
+Route::get('/', function () {
+    return view('welcome');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -62,13 +62,30 @@ Route::post('oauth/access_token', function() {
     if ($resp) {
         session()->put($resp['access_token'], session()->get('user'));
         $resp['user'] = session()->get('user');
+        //store to custom oauth session
+        $data = [
+            'id' => $resp['access_token'],
+            'person_id' => my_decode($resp['user']['id']),
+            'username' => $resp['user']['username'],
+            'role' => $resp['user']['role'],
+        ];
+        \App\OauthCustomSession::create($data);
     }
 
     return Response::json($resp);
 });
 
+//public api
+Route::group(['prefix' => 'api'], function(){
+    Route::post('account/register', 'Api\AccountController@register');
+    Route::post('account/forgot_password', 'Api\AccountController@forgotPassword');
+});
+
 Route::group(['middleware' => ['api', 'oauth'], 'prefix' => 'api'], function () {
     Route::resource('users', 'Api\UsersController', ['except' => ['create', 'edit']]);
-    Route::resource('users.reports', 'Api\ReportsController', ['except' => ['create', 'edit']]);
+    Route::get('users/{userId}/reports', 'Api\ReportsController@index');
+    Route::resource('reports', 'Api\ReportsController', ['except' => ['index', 'create', 'edit']]);
     Route::resource('reports.items', 'Api\ItemsController', ['except' => ['create', 'edit']]);
+    //Route::resource('items.comments', 'Api\ItemsController', ['except' => ['create', 'edit']]);
+    //Route::resource('items.tags', 'Api\ItemsController', ['except' => ['create', 'edit']]);
 });

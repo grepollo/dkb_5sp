@@ -21,10 +21,13 @@ class UserTransformer extends TransformerAbstract
             'gender'       => isset($item['gender']) ? $item['gender'] : '',
             'email'        => isset($item['email']) ? $item['email'] : '',
             'userimage'    => isset($item['userimage']) ? $item['userimage'] : '',
+            'city'         => isset($item['city']) ? $item['city'] : '',
+            'state'        => isset($item['state']) ? $item['state'] : '',
             'country'      => isset($item['country']) ? $item['country'] : '',
             'occupation'   => isset($item['occupation']) ? $item['occupation'] : '',
             'role'         => isset($item['role']) ? $item['role'] : '',
             'created'      => isset($item['created']) ? $item['created'] : '',
+            'updated'      => isset($item['updated']) ? $item['updated'] : '',
             'totalIReport' => isset($item['totalIReport']) ? $item['totalIReport'] : 0,
             'totalGReport' => isset($item['totalGReport']) ? $item['totalGReport'] : 0,
         ];

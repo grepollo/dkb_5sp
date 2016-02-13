@@ -2,45 +2,49 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Item;
 use App\OauthCustomSession;
-use App\Person;
-use App\Report;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Transformers\ItemTransformer;
 use Transformers\ReportTransformer;
 
-class ReportsController extends Controller
+class ItemsController extends Controller
 {
     public function __construct()
     {
-        $this->person = new Person();
-        $this->report = new Report();
+        $this->item = new Item();
     }
 
-    public function index($userId, Request $request)
+    public function index($reportId, Request $request)
     {
-        $userId = (int)my_decode($userId);
-        $response = $this->report->individual($userId);
-        $data = ['individual' => [], 'group' => []];
-        if (! isset($response['error'])) {
-            $data['individual'] = $this->report->respondWithCollection($response['data'], new ReportTransformer);
-        }
-        $response = $this->report->group($userId);
-        if (! isset($response['error'])) {
-            $data['group'] = $this->report->respondWithCollection($response['data'], new ReportTransformer);
-        }
+        $reportId = (int)my_decode($reportId);
+        $params = $request->all();
 
-        return response(['data' => $data]);
+        $data['items'] = [];
+        $data['totalRecords'] = 0;
+        $data['limit'] = isset($params['limit']) ? $params['limit'] : 5;
+        $data['skip'] = isset($params['skip']) ? $params['skip'] : 0;
+        //get all
+        $option = ['limit' => $data['limit'], 'skip' => $data['skip']];
+        $response = $this->item->getItemsByReport($reportId, $option);
+        if (!isset($response['error'])) {
+            $response['items'] = $this->item->respondWithCollection($response['items'], new ItemTransformer);
+            return response(['data' => $response]);
+        } else {
+
+            return response(['error' => $response['error']]);
+        }
     }
 
-    public function show($id, Request $request)
+    public function show($reportId, $id, Request $request)
     {
         $id = my_decode($id);
-        $data = $this->report->get('report_'. $id);
+        $data = $this->item->get('report_'. $id);
         if (! isset($data['error'])) {
 
-            return response($this->report->respondWithItem($data, new ReportTransformer));
+            return response($this->item->respondWithItem($data, new ReportTransformer));
         }
 
         return response(['error' => $data['error']]);
@@ -67,16 +71,16 @@ class ReportsController extends Controller
         //get author
         $user = $this->person->get('person_' . $session->person_id);
         //init default values
-        $id = $this->report->counter('report_counter', ['initial' => 1000, 'value' => 1]);
+        $id = $this->item->counter('report_counter', ['initial' => 1000, 'value' => 1]);
         $params['person_id'] = $session->person_id;
         $params['author'] = isset($user['username']) ? $user['username'] : '';
         $params['report_type'] = isset($params['report_type']) ? (int)$params['report_type'] : 0;
         $params['is_archive'] = isset($params['is_archive']) ? $params['is_archive'] : 'N';
-        $resp = $this->report->insert($id, $params);
+        $resp = $this->item->insert($id, $params);
         if (! isset($resp['error'])) {
             return response([
                 'success' => 'Report created.',
-                'data' => $this->report->respondWithItem($resp, new ReportTransformer)['data']
+                'data' => $this->item->respondWithItem($resp, new ReportTransformer)['data']
             ]);
         }
 
@@ -97,11 +101,11 @@ class ReportsController extends Controller
     {
         $params = $request->all();
         $params['report_type'] = isset($params['report_type']) ? (int)$params['report_type'] : 0;
-        $resp = $this->report->update($id, $params);
+        $resp = $this->item->update($id, $params);
         if (! isset($resp['error'])) {
             return response([
                 'success' => 'Report updated.',
-                'data' => $this->report->respondWithItem($resp, new ReportTransformer)['data']
+                'data' => $this->item->respondWithItem($resp, new ReportTransformer)['data']
             ]);
         }
 
@@ -118,7 +122,7 @@ class ReportsController extends Controller
     {
         $id = 'report_' . my_decode($id);
 
-        $resp = $this->report->delete($id);
+        $resp = $this->item->delete($id);
         if (! isset($resp['error'])) {
 
             return response(['success' => 'Report deleted.']);

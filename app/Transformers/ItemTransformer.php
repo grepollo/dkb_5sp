@@ -15,13 +15,14 @@ class ItemTransformer extends TransformerAbstract
     {
         return [
             'id'          => my_encode($item['id']),
-            'name'        => $item['name'],
+            'title'        => $item['title'],
             'description' => isset($item['description']) ? $item['description'] : '',
-            'created'     => isset($item['created']) ? $item['created'] : '',
-            'person_id'   => isset($item['person_id']) ? $item['person_id'] : '',
-            'author'      => isset($item['author']) ? $item['author'] : '',
+            'comment' => isset($item['comment']) ? $item['comment'] : '',
             'is_archive'  => isset($item['is_archive']) ? $item['is_archive'] : '',
-            'report_type' => isset($item['report_type']) ? $item['report_type'] : ''
+            'person_id'   => isset($item['person_id']) ? my_encode($item['person_id']) : '',
+            'report_id'   => isset($item['report_id']) ? my_encode($item['report_id']) : '',
+            'created'     => isset($item['created']) ? $item['created'] : '',
+            'updated'     => isset($item['updated']) ? $item['updated'] : ''
         ];
     }
 }

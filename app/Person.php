@@ -4,12 +4,16 @@ namespace App;
 
 class Person extends CbModel
 {
-    protected $type;
+    protected $type = "person";
+
+    protected $fillable = [
+        'type', 'username', 'password', 'email', 'first_name', 'last_name', 'gender', 'userimage',
+        'role', 'occupation', 'city', 'state', 'country'
+    ];
 
     public function __construct()
     {
         parent::__construct();
-        $this->type = "person";
     }
 
     public function all($params)
