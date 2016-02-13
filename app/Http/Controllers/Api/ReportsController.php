@@ -40,7 +40,7 @@ class ReportsController extends Controller
         $data = $this->report->get('report_'. $id);
         if (! isset($data['error'])) {
 
-            return response($this->report->respondWithItem($data, new ReportTransformer));
+            return response(['data' => $this->report->respondWithItem($data, new ReportTransformer)]);
         }
 
         return response(['error' => $data['error']]);
@@ -68,7 +68,7 @@ class ReportsController extends Controller
         $user = $this->person->get('person_' . $session->person_id);
         //init default values
         $id = $this->report->counter('report_counter', ['initial' => 1000, 'value' => 1]);
-        $params['person_id'] = $session->person_id;
+        $params['person_id'] = (int)$session->person_id;
         $params['author'] = isset($user['username']) ? $user['username'] : '';
         $params['report_type'] = isset($params['report_type']) ? (int)$params['report_type'] : 0;
         $params['is_archive'] = isset($params['is_archive']) ? $params['is_archive'] : 'N';
@@ -76,7 +76,7 @@ class ReportsController extends Controller
         if (! isset($resp['error'])) {
             return response([
                 'success' => 'Report created.',
-                'data' => $this->report->respondWithItem($resp, new ReportTransformer)['data']
+                'data' => $this->report->respondWithItem($resp, new ReportTransformer)
             ]);
         }
 
@@ -101,7 +101,7 @@ class ReportsController extends Controller
         if (! isset($resp['error'])) {
             return response([
                 'success' => 'Report updated.',
-                'data' => $this->report->respondWithItem($resp, new ReportTransformer)['data']
+                'data' => $this->report->respondWithItem($resp, new ReportTransformer)
             ]);
         }
 

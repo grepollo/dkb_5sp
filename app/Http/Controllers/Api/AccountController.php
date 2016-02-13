@@ -51,7 +51,7 @@ class AccountController extends Controller
         if (! isset($resp['error'])) {
             return response([
                 'success' => 'Account created.',
-                'data' => $this->person->respondWithItem($resp, new UserTransformer)['data']
+                'data' => $this->person->respondWithItem($resp, new UserTransformer)
             ]);
         }
 

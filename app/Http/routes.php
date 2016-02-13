@@ -85,7 +85,12 @@ Route::group(['middleware' => ['api', 'oauth'], 'prefix' => 'api'], function () 
     Route::resource('users', 'Api\UsersController', ['except' => ['create', 'edit']]);
     Route::get('users/{userId}/reports', 'Api\ReportsController@index');
     Route::resource('reports', 'Api\ReportsController', ['except' => ['index', 'create', 'edit']]);
-    Route::resource('reports.items', 'Api\ItemsController', ['except' => ['create', 'edit']]);
-    //Route::resource('items.comments', 'Api\ItemsController', ['except' => ['create', 'edit']]);
-    //Route::resource('items.tags', 'Api\ItemsController', ['except' => ['create', 'edit']]);
+    Route::get('reports/{reportId}/items', 'Api\ItemsController@index');
+    Route::resource('items', 'Api\ItemsController', ['except' => ['index', 'create', 'edit']]);
+    Route::get('items/{itemId}/comments', 'Api\ItemCommentsController@index');
+    Route::resource('comments', 'Api\ItemCommentsController', ['except' => ['index', 'create', 'edit']]);
+    Route::get('items/{itemId}/tags', 'Api\ItemTagsController@index');
+    Route::resource('tags', 'Api\ItemTagsController', ['except' => ['index', 'create', 'edit']]);
+    Route::get('items/{itemId}/data', 'Api\ItemDataController@index');
+    Route::resource('data', 'Api\ItemDataController', ['except' => ['index', 'create', 'edit']]);
 });

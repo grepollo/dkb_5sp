@@ -2,7 +2,7 @@
 
 use League\Fractal\TransformerAbstract;
 
-class ItemTransformer extends TransformerAbstract
+class ItemCommentTransformer extends TransformerAbstract
 {
     /**
      * Turn this item object into a generic array
@@ -23,6 +23,7 @@ class ItemTransformer extends TransformerAbstract
         ];
     }
 }
+
 
 
 

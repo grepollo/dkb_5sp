@@ -26,7 +26,7 @@ abstract class CbModel
         $resource = new Item($item, $callback);
         $rootScope = $fractal->createData($resource);
 
-        return $rootScope->toArray();
+        return $rootScope->toArray()['data'];
     }
 
     public function respondWithCollection($collection, $callback)

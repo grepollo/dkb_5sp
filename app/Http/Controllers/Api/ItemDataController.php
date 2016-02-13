@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Item;
+use App\ItemData;
 use App\OauthCustomSession;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Transformers\ItemTransformer;
+use Transformers\ItemDataTransformer;
 
-class ItemsController extends Controller
+class ItemDataController extends Controller
 {
     public function __construct()
     {
-        $this->item = new Item();
+        $this->model = new ItemData();
     }
 
-    public function index($reportId, Request $request)
+    public function index($itemId, Request $request)
     {
-        $reportId = (int)my_decode($reportId);
+        $itemId = (int)my_decode($itemId);
         $params = $request->all();
 
         $data['items'] = [];
@@ -27,9 +27,9 @@ class ItemsController extends Controller
         $data['skip'] = isset($params['skip']) ? $params['skip'] : 0;
         //get all
         $option = ['limit' => $data['limit'], 'skip' => $data['skip']];
-        $response = $this->item->getItemsByReport($reportId, $option);
+        $response = $this->model->getDataByItem($itemId, $option);
         if (!isset($response['error'])) {
-            $response['items'] = $this->item->respondWithCollection($response['items'], new ItemTransformer);
+            $response['items'] = $this->model->respondWithCollection($response['items'], new ItemDataTransformer);
             return response(['data' => $response]);
         } else {
 
@@ -40,10 +40,10 @@ class ItemsController extends Controller
     public function show($id, Request $request)
     {
         $id = my_decode($id);
-        $data = $this->item->get('item_'. $id);
+        $data = $this->model->get('data_'. $id);
         if (! isset($data['error'])) {
 
-            return response(['data' => $this->item->respondWithItem($data, new ItemTransformer)]);
+            return response(['data' => $this->model->respondWithItem($data, new ItemDataTransformer)]);
         }
 
         return response(['error' => $data['error']]);
@@ -61,26 +61,25 @@ class ItemsController extends Controller
         $session = OauthCustomSession::find(get_token($request));
         $params = $request->all();
         $validator = \Validator::make($request->all(), [
-            'title' => 'bail|required', 'description' => 'required', 'report_id' => 'required'
+            'media' => 'bail|required', 'item_id' => 'required', 'location' => 'required'
         ]);
         if ($validator->fails()) {
             return response(['error' => $validator->errors()->getMessages()]);
         }
         //init default values
-        $id = $this->item->counter('item_counter', ['initial' => 1000, 'value' => 1]);
+        $id = $this->model->counter('item_data_counter', ['initial' => 1000, 'value' => 1]);
         $params['person_id'] = (int)$session->person_id;
-        $params['report_id'] = (int)my_decode($params['report_id']);
-        $params['is_archive'] = isset($params['is_archive']) ? $params['is_archive'] : 'N';
-        $resp = $this->item->insert($id, $params);
+        $params['item_id'] = (int)my_decode($params['item_id']);
+        $resp = $this->model->insert($id, $params);
         if (! isset($resp['error'])) {
             return response([
-                'success' => 'Item created.',
-                'data' => $this->item->respondWithItem($resp, new ItemTransformer)
+                'success' => 'Data created.',
+                'data' => $this->model->respondWithItem($resp, new ItemDataTransformer)
             ]);
         }
 
         //error occur rollback counter
-        $params['id'] = $this->item->counter('item_counter', ['initial' => 1000, 'value' => -1]);
+        $params['id'] = $this->model->counter('item_data_counter', ['initial' => 1000, 'value' => -1]);
 
         return response(['error' => $resp['error']]);
 
@@ -95,11 +94,11 @@ class ItemsController extends Controller
     public function update($id, Request $request)
     {
         $params = $request->all();
-        $resp = $this->item->update($id, $params);
+        $resp = $this->model->update($id, $params);
         if (! isset($resp['error'])) {
             return response([
-                'success' => 'Item updated.',
-                'data' => $this->item->respondWithItem($resp, new ItemTransformer)
+                'success' => 'Data updated.',
+                'data' => $this->model->respondWithItem($resp, new ItemDataTransformer)
             ]);
         }
 
@@ -114,11 +113,11 @@ class ItemsController extends Controller
      */
     public function destroy($id)
     {
-        $id = 'item_' . my_decode($id);
-        $resp = $this->item->delete($id);
+        $id = 'data_' . my_decode($id);
+        $resp = $this->model->delete($id);
         if (! isset($resp['error'])) {
 
-            return response(['success' => 'Item deleted.']);
+            return response(['success' => 'Data deleted.']);
         }
 
         return response(['error' => $resp['error']]);

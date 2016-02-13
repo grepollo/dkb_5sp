@@ -2,7 +2,7 @@
 
 use League\Fractal\TransformerAbstract;
 
-class ItemTransformer extends TransformerAbstract
+class ItemDataTransformer extends TransformerAbstract
 {
     /**
      * Turn this item object into a generic array
@@ -15,14 +15,16 @@ class ItemTransformer extends TransformerAbstract
     {
         return [
             'id'        => my_encode($item['id']),
-            'comment'   => isset($item['comment']) ? $item['comment'] : '',
-            'person_id' => isset($item['person_id']) ? my_encode($item['person_id']) : '',
+            'media'     => isset($item['media']) ? $item['media'] : '',
+            'location'  => isset($item['location']) ? $item['location'] : '',
             'item_id'   => isset($item['item_id']) ? my_encode($item['item_id']) : '',
+            'person_id' => isset($item['person_id']) ? my_encode($item['person_id']) : '',
             'created'   => isset($item['created']) ? $item['created'] : '',
             'updated'   => isset($item['updated']) ? $item['updated'] : ''
         ];
     }
 }
+
 
 
 

@@ -2,28 +2,28 @@
 
 namespace App;
 
-class Item extends CbModel
+class ItemData extends CbModel
 {
-    protected $type = 'item';
+    protected $type = 'data';
 
-    protected $fillable = ['title', 'description', 'comment', 'is_archive', 'person_id', 'report_id'];
+    protected $fillable = ['item_id', 'person_id', 'media', 'location'];
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function getItemsByReport($reportId, $params)
+    public function getDataByItem($itemId, $params)
     {
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('item', 'report_items')
-                ->key($reportId)
+            $query = \CouchbaseViewQuery::from('item', 'item_data')
+                ->key($itemId)
                 ->limit($limit)->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('item', 'report_items')
-                ->key($reportId);
+            $query = \CouchbaseViewQuery::from('item', 'item_data')
+                ->key($itemId);
         }
 
         $result = [];

@@ -2,28 +2,28 @@
 
 namespace App;
 
-class Item extends CbModel
+class ItemTag extends CbModel
 {
-    protected $type = 'item';
+    protected $type = 'tags';
 
-    protected $fillable = ['title', 'description', 'comment', 'is_archive', 'person_id', 'report_id'];
+    protected $fillable = ['tag', 'item_id'];
 
     public function __construct()
     {
         parent::__construct();
     }
 
-    public function getItemsByReport($reportId, $params)
+    public function getTagsByItem($itemId, $params)
     {
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('item', 'report_items')
-                ->key($reportId)
+            $query = \CouchbaseViewQuery::from('item', 'item_tags')
+                ->key($itemId)
                 ->limit($limit)->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('item', 'report_items')
-                ->key($reportId);
+            $query = \CouchbaseViewQuery::from('item', 'item_tags')
+                ->key($itemId);
         }
 
         $result = [];

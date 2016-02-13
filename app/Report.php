@@ -18,11 +18,11 @@ class Report extends CbModel
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('persons_report', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'by_person')
                 ->key($personId)
                 ->limit($limit)->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('persons_report', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'by_person')
                 ->key($personId);
         }
 
@@ -52,11 +52,11 @@ class Report extends CbModel
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('individual_reports', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'individual')
                 ->key($personId)
                 ->limit($limit)->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('individual_reports', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'individual')
                 ->key($personId);
         }
 
@@ -86,11 +86,11 @@ class Report extends CbModel
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('group_reports', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'group')
                 ->key($personId)
                 ->limit($limit)->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('group_reports', 'by_person')
+            $query = \CouchbaseViewQuery::from('report', 'group')
                 ->key($personId);
         }
 

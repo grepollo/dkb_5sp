@@ -73,8 +73,7 @@ class UsersController extends Controller
             $data['totalIReport'] = isset($reports['data']) ? count($reports['data']) : 0;
             $reports = $this->report->group($id);
             $data['totalGReport'] = isset($reports['data']) ? count($reports['data']) : 0;
-            $data['id'] = my_encode((string)$id);
-            return response($this->report->respondWithItem($data, new UserTransformer));
+            return response(['data' => $this->report->respondWithItem($data, new UserTransformer)]);
         }
 
         return response(['error' => $data['error']]);
@@ -107,7 +106,7 @@ class UsersController extends Controller
             return response(['error' => 'Username already exist.']);
         }
         //init default values
-        $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
+        $id = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
         $params['type'] = 'person';
         $params['role'] = 'U';
         $params['password'] = bcrypt($params['password']);
@@ -121,7 +120,7 @@ class UsersController extends Controller
         }
 
         //error occur rollback counter
-        $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => -1]);
+        $id = $this->person->counter('person_counter', ['initial' => 1000, 'value' => -1]);
 
         return response(['error' => $resp['error']]);
 
@@ -142,7 +141,7 @@ class UsersController extends Controller
         if (!isset($resp['error'])) {
             return response([
                 'success' => 'User updated.',
-                'data'    => $this->report->respondWithItem($resp, new UserTransformer)['data']
+                'data'    => $this->report->respondWithItem($resp, new UserTransformer)
             ]);
         }
 
