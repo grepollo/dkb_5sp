@@ -37,7 +37,7 @@ class PasswordGrantVerifier
 
         if ($auth) {
             $result = $person->respondWithItem($resp, new UserTransformer);
-            session()->put('user', $result['data']);
+            session()->put('user', $result);
 
             return my_decode($resp['id']);
         }
