@@ -107,7 +107,8 @@ class UsersController extends Controller
             return response(['error' => 'Username already exist.']);
         }
         //init default values
-        $id = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
+        $params['id'] = $this->person->counter('person_counter', ['initial' => 1000, 'value' => 1]);
+        $params['type'] = 'person';
         $params['role'] = 'U';
         $params['password'] = bcrypt($params['password']);
 
