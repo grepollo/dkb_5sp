@@ -23,7 +23,7 @@ class PasswordGrantVerifier
                 if (md5($credentials['password']) == $resp['password']) {
                     //convert old pass to new hashing
                     $resp['password'] = bcrypt($credentials['password']);
-                    $id = 'person_' . $resp['id'];
+                    $id =  my_encode($resp['id']);
                     $person->update($id, $resp);
                     $auth = true;
                 } else {
