@@ -29,26 +29,26 @@ class DashboardController extends Controller
                 $response = $person->getAssignedPersons(session('user.id'));
                 if (!empty($response)) {
                     //get total reports or their assigned users
-                    $data['total_users'] = count($response);
-                    foreach ($response as $row) {
+                    $data['total_users'] = $response['totalRecords'];
+                    foreach ($response['data'] as $row) {
                         $reports = $report->getReportsByPerson($row['id']);
-                        if (!empty($response)) {
-                            $data['total_report'] += count($reports);
+                        if (!empty($reports['data'])) {
+                            $data['total_report'] += $reports['totalRecords'];
                             //get item of the report
-                            foreach ($reports as $srow) {
+                            foreach ($reports['data'] as $srow) {
                                 $items = $item->getItemsByReport($srow['id']);
-                                $data['total_item'] += count($items);
+                                $data['total_item'] += $items['totalRecords'];
                             }
                         }
                     }
                     //get current user's report
                     $response = $report->getReportsByPerson(session('user.id'));
-                    if (!empty($response)) {
-                        $data['total_report'] += count($response);
+                    if (!empty($response['data'])) {
+                        $data['total_report'] += $response['totalRecords'];
                         //get item of the report
-                        foreach ($response as $row) {
+                        foreach ($response['data'] as $row) {
                             $items = $item->getItemsByReport($row['id']);
-                            $data['total_item'] += count($items);
+                            $data['total_item'] += $items['totalRecords'];
                         }
                     }
                 }
@@ -56,15 +56,15 @@ class DashboardController extends Controller
                 $response = $person->all([]);
                 if (!empty($response)) {
                     //get total reports or their assigned users
-                    $data['total_users'] = count($response);
-                    foreach ($response as $row) {
+                    $data['total_users'] = $response['totalRecords'];
+                    foreach ($response['data'] as $row) {
                         $reports = $report->getReportsByPerson($row['id']);
-                        if (!empty($response)) {
-                            $data['total_report'] += count($reports);
+                        if (isset($reports['data']) && !empty($reports['data'])) {
+                            $data['total_report'] += $reports['totalRecords'];
                             //get item of the report
-                            foreach ($reports as $srow) {
+                            foreach ($reports['data'] as $srow) {
                                 $items = $item->getItemsByReport($srow['id']);
-                                $data['total_item'] += count($items);
+                                $data['total_item'] += $items['totalRecords'];
                             }
                         }
                     }

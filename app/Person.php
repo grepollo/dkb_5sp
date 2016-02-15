@@ -43,23 +43,37 @@ class Person extends CbModel
         return $result;
     }
 
-    public function getAssignedPersons($managerID)
+    public function getAssignedPersons($managerID, $params = [])
     {
-        $query = \CouchbaseViewQuery::from('manager_users', 'by_manager')->key($managerID);
-        $persons = [];
+        $limit = isset($params['limit']) ? $params['limit'] : 0;
+        $skip = isset($params['skip']) ? $params['skip'] : 0;
+        if (isset($params['limit'])) {
+            $query = \CouchbaseViewQuery::from('manager_users', 'by_manager')
+                ->key($managerID)
+                ->limit($limit)->skip($skip);
+        } else {
+            $query = \CouchbaseViewQuery::from('manager_users', 'by_manager')
+                ->key($managerID);
+        }
+
+        $result = [];
         try {
-            $response = $this->cb->query($query, null, true);
-            if (! empty($response['rows'])) {
-                foreach($response['rows'] as $item) {
-                    $persons[] = $item['value'];
+            $res = $this->cb->query($query, null, true);
+            if (! empty($res)) {
+                $result['data'] = [];
+                $count = 0;
+                foreach($res['rows'] as $item) {
+                    $result['data'][] = $item['value'];
+                    $count++;
                 }
+                $result['totalRecords'] = $count;
             }
         } catch(\CouchbaseException $e) {
 
-            $persons['error'] = $e->getMessage();
+            $result['error'] = $e->getMessage();
         }
 
-        return $persons;
+        return $result;
     }
 
     public function getUsername($username)

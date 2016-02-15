@@ -44,6 +44,8 @@ Route::group(['middleware' => ['web']], function () {
     //Users
     Route::get('/users', 'UsersController@index');
     Route::get('/users/{id}', 'UsersController@show');
+    //Reports
+    Route::get('/reports/{id}', 'ReportsController@show');
 });
 
 Route::get('/setup', 'Tools\SetupController@index');

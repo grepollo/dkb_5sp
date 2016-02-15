@@ -23,7 +23,7 @@
     </div>
     @foreach($users as $user)
     <div class="member-entry">
-        <a href="{{ url('users/' . my_encode($user['id'])) }}" class="member-img">
+        <a href="{{ url('users/' . $user['id']) }}" class="member-img">
 
             @if(file_exists(public_path('assets/images/users/' . $user["userimage"])) && ! empty($user["userimage"]))
             <img src="{{ asset('assets/images/users/' . $user["userimage"]) }}" class="img-rounded" />
@@ -35,7 +35,7 @@
 
         <div class="member-details">
             <h4>
-                <a href="{{ url('users/' . my_encode($user['id'])) }}">{{ $user['first_name'].''.$user['last_name'] }}</a>
+                <a href="{{ url('users/' . $user['id']) }}">{{ $user['first_name'].''.$user['last_name'] }}</a>
             </h4>
 
             <!-- Details with Icons -->
@@ -58,19 +58,19 @@
 
                 @if(session('user.role') =='A')
 
-                @if($user['type']=='M')
+                @if($user['role']=='M')
                 <div class="col-sm-4">
                     <i class="entypo-users"></i>
-                    <a href="javascript:;" onclick="showAjaxModal('{{ my_encode($user['id']) }}');">Assigned Users</a>
+                    <a href="javascript:;" onclick="showAjaxModal('{{ $user['id'] }}');">Assigned Users</a>
                 </div>
                 <div class="col-sm-4">
                     <i class="entypo-cancel-squared"></i>
-                    <a href="javascript:;" onclick="revoke_manager('{{ my_encode($user['id']) }}');">Revoke from Manager</a>
+                    <a href="javascript:;" onclick="revoke_manager('{{ $user['id'] }}');">Revoke from Manager</a>
                 </div>
                 @else
                 <div class="col-sm-4">
                     <i class="entypo-users"></i>
-                    <a href="javascript:;" onclick="if(confirm('Are You Sure to Appoint as a Manager ?')){save_user_list('{{ my_encode($user['id']) }}')}">Appoint as Manager</a>
+                    <a href="javascript:;" onclick="if(confirm('Are You Sure to Appoint as a Manager ?')){save_user_list('{{ $user['id'] }}')}">Appoint as Manager</a>
                 </div>
                 @endif
                 @endif

@@ -13,7 +13,7 @@ class Item extends CbModel
         parent::__construct();
     }
 
-    public function getItemsByReport($reportId, $params)
+    public function getItemsByReport($reportId, $params = [])
     {
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
