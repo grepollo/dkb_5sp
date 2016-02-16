@@ -10,7 +10,7 @@
 		
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         	@if(session('user.type') != 'A')
-                                @if(getimagesize( public_path('assets/images/users/'. 'user' . session('user.id') . '.jpg')))
+								@if(file_exists(public_path('assets/images/users/' .  'user' . session('user.id') . '.jpg')))
                                     <img src="{{ asset('assets/images/users/' . 'user' . session('user.id') . '.jpg' ) }}" class="img-circle" width="44" height="44" />
                                 @else
                                     <img src="{{  asset('assets/images/user.png') }}" class="img-circle" width="44" />
