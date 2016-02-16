@@ -35,21 +35,55 @@ class SetupController extends Controller
                             $item['report_type'] = $item['type'];
                             $item['type'] = $table;
                             $myBucket->upsert($docId, $item);
+                        } elseif ($table == 'family') {
+                            //do nothing
                         } else {
                             $item['type'] = $table;
                             $myBucket->upsert($docId, $item);
                         }
-
                         echo 'Inserting document: ' . $docId . '<br/>';
+                    }
+                    $members = $this->processReportMembers();
+                    //delete existing family in the document
+                    $query = \CouchbaseViewQuery::from('family', 'by_report');
+                    $res = $myBucket->query($query, null, true);
+                    foreach ($res['rows'] as $row) {
+                        $myBucket->remove($row['id']);
+                    }
+                    foreach($members as $id => $val) {
+                        $tmp = explode('_', $id);
+                        $item = [
+                            'type' => 'family',
+                            'report_id' =>(int) end($tmp),
+                            'members' => $val
+                        ];
+                        $myBucket->upsert($id, $item);
                     }
                 }
             }
         }
+        return 'Setup done.';
     }
 
     private function getData($table)
     {
         return DB::select('select * from ' . $table);
+    }
+
+    private function processReportMembers()
+    {
+        $reports = DB::select('select * from report where type = 1');
+        $data = [];
+        foreach($reports as $report)
+        {
+            $members = DB::select('select * from family where report_id = ' . $report->id);
+            foreach($members as $member) {
+                $data['family_' . $report->id][] = $member->id;
+            }
+        }
+
+       return $data;
+
     }
 
     /**

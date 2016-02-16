@@ -35,7 +35,7 @@
 
         <div class="member-details">
             <h4>
-                <a href="{{ url('users/' . $user['id']) }}">{{ $user['first_name'].''.$user['last_name'] }}</a>
+                <a href="{{ url('users/' . $user['id']) }}">{{ $user['first_name'] . ' ' . $user['last_name'] }}</a>
             </h4>
 
             <!-- Details with Icons -->

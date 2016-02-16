@@ -65,7 +65,7 @@
                 <div class="form-group lockscreen-input">
 
                     <div class="lockscreen-thumb">
-                        <img src="assets/images/user.png" width="140" class="img-circle" />
+                        <img src="{{ asset('assets/images/user.png') }}" width="140" class="img-circle" />
 
                         <div class="lockscreen-progress-indicator">0%</div>
                     </div>
@@ -112,22 +112,22 @@
 
 
 <!-- Bottom scripts (common) -->
-<script src="assets/js/gsap/TweenMax.min.js"></script>
-<script src="assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js"></script>
-<script src="assets/js/bootstrap.js"></script>
-<script src="assets/js/joinable.js"></script>
-<script src="assets/js/resizeable.js"></script>
-<script src="assets/js/neon-api.js"></script>
-<script src="assets/js/jquery.validate.min.js"></script>
-<script src="assets/js/neon-login.js"></script>
+<script src="{{ asset('assets/js/gsap/TweenMax.min.js') }}"></script>
+<script src="{{ asset('assets/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js') }}"></script>
+<script src="{{ asset('assets/js/bootstrap.js') }}"></script>
+<script src="{{ asset('assets/js/joinable.js') }}"></script>
+<script src="{{ asset('assets/js/resizeable.js') }}"></script>
+<script src="{{ asset('assets/js/neon-api.js') }}"></script>
+<script src="{{ asset('assets/js/jquery.validate.min.js') }}"></script>
+<script src="{{ asset('assets/js/neon-login.js') }}"></script>
 
 
 <!-- JavaScripts initializations and stuff -->
-<script src="assets/js/neon-custom.js"></script>
+<script src="{{ asset('assets/js/neon-custom.js') }}"></script>
 
 
 <!-- Demo Settings -->
-<script src="assets/js/neon-demo.js"></script>
+<script src="{{ asset('assets/js/neon-demo.js') }}"></script>
 
 </body>
 </html>

@@ -16,7 +16,7 @@ class Person extends CbModel
         parent::__construct();
     }
 
-    public function all($params)
+    public function all($params = [])
     {
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
