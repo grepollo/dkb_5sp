@@ -27,19 +27,25 @@ class SetupController extends Controller
                     foreach ($data as $row) {
                         $item = (array)$row;
                         $docId = $table . '_' . $item['id'];
+                        //cast int data type
+                        foreach($item as $field => $val) {
+                            if (is_integer($val)) {
+                                $item[$field] = (int) $val;
+                            }
+                        }
                         if ($table == 'person') {
                             $item['role'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->upsert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         } elseif ($table == 'report') {
                             $item['report_type'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->upsert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         } elseif ($table == 'family') {
                             //do nothing
                         } else {
                             $item['type'] = $table;
-                            $myBucket->upsert($docId, $item);
+                            $myBucket->replace($docId, $item);
                         }
                         echo 'Inserting document: ' . $docId . '<br/>';
                     }
