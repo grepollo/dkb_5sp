@@ -29,7 +29,7 @@ class SetupController extends Controller
                         $docId = $table . '_' . $item['id'];
                         //cast int data type
                         foreach($item as $field => $val) {
-                            if (is_integer($val)) {
+                            if (is_numeric($val)) {
                                 $item[$field] = (int) $val;
                             }
                         }
