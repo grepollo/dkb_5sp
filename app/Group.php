@@ -19,10 +19,12 @@ class Group extends CbModel
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
             $query = \CouchbaseViewQuery::from('family', 'by_report')
+                ->stale(1)
                 ->key($reportId)
                 ->limit($limit)->skip($skip);
         } else {
             $query = \CouchbaseViewQuery::from('family', 'by_report')
+                ->stale(1)
                 ->key($reportId);
         }
 

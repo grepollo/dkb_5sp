@@ -104,7 +104,11 @@ abstract class CbModel
         $resp = [];
         try {
             $resp = $this->cb->get($docId);
-            $resp = (array)$resp->value;
+            if(is_string($resp->value)) {
+                $resp = json_decode($resp->value, true);
+            } else {
+                $resp = (array)$resp->value;
+            }
         } catch(\CouchbaseException $e) {
 
             $resp['error'] = $e->getMessage();

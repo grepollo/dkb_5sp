@@ -13,16 +13,18 @@ class ItemComment extends CbModel
         parent::__construct();
     }
 
-    public function getCommentsByItem($itemId, $params)
+    public function getCommentsByItem($itemId, $params = [])
     {
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
             $query = \CouchbaseViewQuery::from('item', 'item_comments')
+                ->stale(1)
                 ->key($itemId)
                 ->limit($limit)->skip($skip);
         } else {
             $query = \CouchbaseViewQuery::from('item', 'item_comments')
+                ->stale(1)
                 ->key($itemId);
         }
 

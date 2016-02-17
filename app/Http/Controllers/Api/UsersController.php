@@ -110,12 +110,11 @@ class UsersController extends Controller
         $params['type'] = 'person';
         $params['role'] = 'U';
         $params['password'] = bcrypt($params['password']);
-
         $resp = $this->person->insert($id, $params);
         if (!isset($resp['error'])) {
             return response([
                 'success' => 'User created.',
-                'data'    => $this->report->respondWithItem($params, new UserTransformer)
+                'data'    => $this->report->respondWithItem($resp, new UserTransformer)
             ]);
         }
 

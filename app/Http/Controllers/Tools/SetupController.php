@@ -36,36 +36,63 @@ class SetupController extends Controller
                         if ($table == 'person') {
                             $item['role'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->replace($docId, $item);
+                            $myBucket->upsert($docId, $item);
                         } elseif ($table == 'report') {
                             $item['report_type'] = $item['type'];
                             $item['type'] = $table;
-                            $myBucket->replace($docId, $item);
+                            $myBucket->upsert($docId, $item);
                         } elseif ($table == 'family') {
                             //do nothing
                         } else {
                             $item['type'] = $table;
-                            $myBucket->replace($docId, $item);
+                            $myBucket->upsert($docId, $item);
                         }
                         echo 'Inserting document: ' . $docId . '<br/>';
                     }
-                    $members = $this->processReportMembers();
-                    //delete existing family in the document
-                    $query = \CouchbaseViewQuery::from('family', 'by_report');
-                    $res = $myBucket->query($query, null, true);
-                    foreach ($res['rows'] as $row) {
-                        $myBucket->remove($row['id']);
-                    }
-                    foreach($members as $id => $val) {
-                        $tmp = explode('_', $id);
-                        $item = [
-                            'type' => 'family',
-                            'report_id' =>(int) end($tmp),
-                            'members' => $val
-                        ];
-                        $myBucket->upsert($id, $item);
-                    }
                 }
+            }
+            $members = $this->processReportMembers();
+            //delete existing family in the document
+            $query = \CouchbaseViewQuery::from('family', 'by_report')->stale(1);
+            $res = $myBucket->query($query, null, true);
+            foreach ($res['rows'] as $row) {
+                try{
+                    $myBucket->remove($row['id']);
+                } catch (\CouchbaseException $e) {
+                    echo $e->getMessage() . "<br/>";
+                    continue;
+                }
+            }
+            foreach($members as $id => $val) {
+                $tmp = explode('_', $id);
+                $item = [
+                    'type' => 'family',
+                    'report_id' =>(int) end($tmp),
+                    'members' => $val
+                ];
+                $myBucket->upsert($id, $item);
+            }
+            $tags = $this->processItemTags();
+            //delete existing tags in the document
+            $query = \CouchbaseViewQuery::from('item', 'item_tags')->stale(1);
+            $res = $myBucket->query($query, null, true);
+            foreach ($res['rows'] as $row) {
+                try{
+                    $myBucket->remove($row['id']);
+                } catch (\CouchbaseException $e) {
+                    echo $e->getMessage() . "<br/>";
+                    continue;
+                }
+
+            }
+            foreach($tags as $id => $val) {
+                $tmp = explode('_', $id);
+                $item = [
+                    'type' => 'tags',
+                    'item_id' =>(int) end($tmp),
+                    'tags' => $val
+                ];
+                $myBucket->upsert($id, $item);
             }
         }
         return 'Setup done.';
@@ -90,6 +117,23 @@ class SetupController extends Controller
 
        return $data;
 
+    }
+
+    private function processItemTags()
+    {
+        $items = DB::select('select * from item ');
+        $data = [];
+        foreach($items as $item)
+        {
+            $tags = DB::select('select * from tags where item_id = ' . $item->id);
+            foreach($tags as $tag) {
+                if (! empty($tag->tag)) {
+                    $data['tags_' . $item->id][] = $tag->tag;
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**

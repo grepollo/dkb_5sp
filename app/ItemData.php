@@ -19,10 +19,12 @@ class ItemData extends CbModel
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
             $query = \CouchbaseViewQuery::from('item', 'item_data')
+                ->stale(1)
                 ->key($itemId)
                 ->limit($limit)->skip($skip);
         } else {
             $query = \CouchbaseViewQuery::from('item', 'item_data')
+                ->stale(1)
                 ->key($itemId);
         }
 

@@ -7,7 +7,7 @@ class Person extends CbModel
     protected $type = "person";
 
     protected $fillable = [
-        'type', 'username', 'password', 'email', 'first_name', 'last_name', 'gender', 'userimage',
+        'id', 'type', 'username', 'password', 'email', 'first_name', 'last_name', 'gender', 'userimage',
         'role', 'occupation', 'city', 'state', 'country'
     ];
 
@@ -21,9 +21,12 @@ class Person extends CbModel
         $limit = isset($params['limit']) ? $params['limit'] : 0;
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
-            $query = \CouchbaseViewQuery::from('person', 'username')->limit($limit)->skip($skip);
+            $query = \CouchbaseViewQuery::from('person', 'username')
+                ->stale(1)
+                ->limit($limit)
+                ->skip($skip);
         } else {
-            $query = \CouchbaseViewQuery::from('person', 'username');
+            $query = \CouchbaseViewQuery::from('person', 'username')->stale(1);
         }
 
         $result = [];
@@ -49,10 +52,12 @@ class Person extends CbModel
         $skip = isset($params['skip']) ? $params['skip'] : 0;
         if (isset($params['limit'])) {
             $query = \CouchbaseViewQuery::from('manager_users', 'by_manager')
+                ->stale(1)
                 ->key($managerID)
                 ->limit($limit)->skip($skip);
         } else {
             $query = \CouchbaseViewQuery::from('manager_users', 'by_manager')
+                ->stale(1)
                 ->key($managerID);
         }
 
@@ -78,10 +83,12 @@ class Person extends CbModel
 
     public function getUsername($username)
     {
-        $query = \CouchbaseViewQuery::from('person', 'username')->key($username);
+        $query = \CouchbaseViewQuery::from('person', 'username')
+            ->stale(1)
+            ->key($username);
         $person = [];
         try {
-            $res = $this->cb->query($query, null, true);
+            $res = $this->cb->query($query, false, true);
             if (! empty($res)) {
 
                 foreach($res['rows'] as $item) {
